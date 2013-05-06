@@ -30,7 +30,6 @@ class AliEPFlattener;
 
 class ClusterSelectionTask:public AliAnalysisTaskSE {
 public:
-public:
   ClusterSelectionTask(const char *name = "Task");
    virtual ~ ClusterSelectionTask();
 
