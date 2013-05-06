@@ -136,6 +136,7 @@ void ClusterSelectionTask::UserExec(Option_t *)
     AliCaloPhoton * ph = new  AliCaloPhoton(lorentzMomentum.X(),lorentzMomentum.Py(),lorentzMomentum.Z(),lorentzMomentum.E());
     fClusterContainer->Add(ph);
   }
+  fh1NClusters->Fill(nClusters);
 
   // Post output data.
   PostData(1, fHistogramContainer);
