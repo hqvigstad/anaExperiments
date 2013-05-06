@@ -1,0 +1,1 @@
+root -b -q -l setupSingleTask.C'("filelist.txt", -1)' run-single-task.C'("local", "AOD", "AddTask.C")'
