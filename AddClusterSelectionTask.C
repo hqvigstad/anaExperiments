@@ -14,7 +14,7 @@ void AddClusterSelectionTask(TString name = "ClusterSelectionTask")
   }
 
   gROOT->LoadMacro("ClusterSelectionTask.cxx+g");
-  ClusterSelectionTask * task = new ClusterSelectionTask();
+  ClusterSelectionTask * task = new ClusterSelectionTask(name);
   
   mgr->AddTask(task);
   mgr->ConnectInput(task, 0, mgr->GetCommonInputContainer() );
