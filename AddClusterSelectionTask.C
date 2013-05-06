@@ -19,10 +19,14 @@ void AddClusterSelectionTask(TString name = "ClusterSelectionTask")
   mgr->AddTask(task);
   mgr->ConnectInput(task, 0, mgr->GetCommonInputContainer() );
   
-  TString cname(Form("%sCoutput1", name));
+  TString cname(Form("HistList", name));
   TString pname(Form("%s:%s", AliAnalysisManager::GetCommonFileName(), name));
   AliAnalysisDataContainer *coutput1 = mgr->CreateContainer(cname.Data(), TList::Class(), AliAnalysisManager::kOutputContainer, pname.Data());
   mgr->ConnectOutput(task, 1, coutput1);
+  
+  cname = Form("SelectedPhotons", name);
+  AliAnalysisDataContainer *cexchange2 = mgr->CreateContainer(cname.Data(), TList::Class(), AliAnalysisManager::kExchangeContainer, pname.Data());
+  mgr->ConnectOutput(task, 2, cexchange2);
   
   return task;
 }

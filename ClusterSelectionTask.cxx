@@ -77,13 +77,15 @@ Double_t rnlin(Double_t *x, Double_t * /*par*/)
 //________________________________________________________________________
 ClusterSelectionTask::ClusterSelectionTask(const char *name)
 : AliAnalysisTaskSE(name),
-  fOutputContainer(0x0),
+  fHistogramContainer(0x0),
+  fClusterContainer(0x0),
   fh1NClusters(0x0),
   fh1CluEnergy(0x0)
 {
 
-  // Output slots #0 write into a TH1 container
+  // Output slots #1 write into a TH1 container
   DefineOutput(1,TList::Class());
+  DefineOutput(2,TList::Class());
 }
 //___________________________________________________________________________
 ClusterSelectionTask::~ClusterSelectionTask()
@@ -93,16 +95,17 @@ ClusterSelectionTask::~ClusterSelectionTask()
 void ClusterSelectionTask::UserCreateOutputObjects()
 {
   // histograms
-  if(fOutputContainer != NULL){
-    delete fOutputContainer;
-  }
-  fOutputContainer = new THashList();
-  fOutputContainer->SetOwner(kTRUE);
+  fHistogramContainer = new THashList();
+  fHistogramContainer->SetOwner(kTRUE);
+  // clusters
+  fClusterContainer = new THashList();
+  fClusterContainer->SetOwner(kTRUE);
 
-  fOutputContainer->Add(fh1NClusters = new TH1F("h1NClusters","Number of Clusters", 100, 0., 100.)) ;
-  fOutputContainer->Add(fh1CluEnergy = new TH1F("h1CluEnergy","Event selection", 300,0.,30.)) ;
+  fHistogramContainer->Add(fh1NClusters = new TH1F("h1NClusters","Number of Clusters", 100, 0., 100.)) ;
+  fHistogramContainer->Add(fh1CluEnergy = new TH1F("h1CluEnergy","Event selection", 300,0.,30.)) ;
   
-  PostData(1, fOutputContainer);
+  PostData(1, fHistogramContainer);
+  PostData(2, fClusterContainer);
 }
 
 //________________________________________________________________________
@@ -110,6 +113,8 @@ void ClusterSelectionTask::UserExec(Option_t *)
 {
   // Main loop, called for each event
   // Analyze ESD/AOD
+  
+  fClusterContainer->Clear();
 
   AliVEvent* event = GetEvent();
   int nClusters =0;
@@ -123,12 +128,18 @@ void ClusterSelectionTask::UserExec(Option_t *)
     
     fh1CluEnergy->Fill(clu->E());
     
+    TLorentzVector lorentzMomentum;
+    Double_t origo[3] = {0,0,0};
+    clu->GetMomentum(lorentzMomentum, origo);
+    
     //fCaloPhotonsPHOS->Add(new  AliCaloPhoton(lorentzMomentum.X(),lorentzMomentum.Py(),lorentzMomentum.Z(),lorentzMomentum.E()) );
-    //AliCaloPhoton * ph = new  AliCaloPhoton(lorentzMomentum.X(),lorentzMomentum.Py(),lorentzMomentum.Z(),lorentzMomentum.E());
+    AliCaloPhoton * ph = new  AliCaloPhoton(lorentzMomentum.X(),lorentzMomentum.Py(),lorentzMomentum.Z(),lorentzMomentum.E());
+    fClusterContainer->Add(ph);
   }
 
   // Post output data.
-  PostData(1, fOutputContainer);
+  PostData(1, fHistogramContainer);
+  PostData(2, fClusterContainer);
 }
 
 AliVEvent* ClusterSelectionTask::GetEvent()
@@ -136,7 +147,7 @@ AliVEvent* ClusterSelectionTask::GetEvent()
   AliVEvent* event = InputEvent();
   if( ! event ) {
     AliError("Event could not be retrieved");
-    PostData(1, fOutputContainer);
+    PostData(1, fHistogramContainer);
   }
   return event;
 }

@@ -50,7 +50,9 @@ protected:
   static const Double_t kMinClusterEnergy = 0.3;
   static const Int_t kMinNCells = 3;
 
-  TList *fOutputContainer;	//final histogram container
+  TList *fHistogramContainer;	//final histogram container
+  TList *fClusterContainer;
+  
 
   TH1 *fh1NClusters;
   TH1 *fh1CluEnergy;
